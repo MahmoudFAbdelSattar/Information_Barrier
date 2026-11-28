@@ -1,92 +1,297 @@
-# Information Barrier of Algebraic Wall Functions
+The Information Barrier of Algebraic Wall Functions
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Computational Supplementary Material
 
-This repository contains the supplementary material and Python code for reproducing the numerical results, tables, and figures presented in the paper:
+This repository contains the computational framework accompanying the research manuscript:
 
-> **"The Information Barrier of Algebraic Wall Functions: Why \(U\) and \(k\) Cannot Determine the Arcsinh-Transformed Velocity Variance"**
-> *Mahmoud F. Abdel-Sattar* 
-> *Submitted to Journal of Fluid Mechanics (Rapids)*
+«The Information Barrier of Algebraic Wall Functions: Why U and k Cannot Determine the Arcsinh-Transformed Velocity Variance»
 
-## 📖 Overview of the Theory
+The project investigates a fundamental information limitation of algebraic turbulence closures that attempt to determine the variance of an arcsinh-transformed velocity magnitude using only the mean streamwise velocity (U) and turbulent kinetic energy (k).
 
-In turbulence modeling, a pervasive assumption is that one can construct a closed-form algebraic wall function \(f(U,k)\) to predict the variance of the arcsinh-transformed velocity, \(\langle\phi'^2\rangle\), using solely the mean velocity \(U\) and the turbulent kinetic energy \(k\). 
+The computational experiments quantify this limitation within controlled Gaussian velocity ensembles and examine its implications using DNS-parameterized Gaussian surrogate data.
 
-This code proves that this assumption is mathematically impossible. It demonstrates the existence of an **"Information Barrier"**: because \(k\) constrains only the trace of the Reynolds stress tensor, it lacks the directional information (anisotropy) required to determine individual variance components. 
+---
 
-Using a controlled Gaussian Monte Carlo surrogate parameterized by DNS data, the code quantifies this bound. It shows that at a fixed \((U, k)\) in the buffer layer, the true variance fluctuates by a factor of 4.7 depending on the anisotropy ratio \(A\). By the triangle inequality, this enforces a strict minimax lower bound, translating to a relative error strictly greater than **60%** for *any* arbitrary algebraic closure \(f(U,k)\).
+1. Scientific Objective
 
-## 📂 Repository Structure
+The central quantity considered in this study is
 
-```text
-.
-├── supplementary.py        # Main script to reproduce all results
-├── README.md               # This file
-├── figures/                # Output directory (generated upon run)
-├── results/                # Output directory for CSV/JSON (generated upon run)
-├── chan180/                # DNS Data folder (Re_tau = 180)
-├── chan395/                # DNS Data folder (Re_tau = 395)
-└── chan590/                # DNS Data folder (Re_tau = 590)
-```
+[
+\phi = \operatorname{arcsinh}(|\mathbf{v}|),
+]
 
-⚙️ Requirements
+where the instantaneous velocity vector is
 
-Ensure you have Python 3.8 or higher installed. You can install the required dependencies via pip:
+[
+\mathbf{v}=(U+u',v',w').
+]
 
-```bash
-pip install numpy scipy matplotlib
-```
+The target statistic is
 
-🚀 Usage
+[
+g=\operatorname{Var}(\phi).
+]
 
-1. Data Preparation
+The central question is whether (g) can be uniquely determined by the two scalar quantities (U) and (k).
 
-The code requires the channel-flow DNS data of Moser, Kim & Mansour (1999) for Re_\tau = 180, 395, and 590.
+The manuscript establishes an information barrier for any deterministic algebraic closure of the form
 
-· Local Run: Ensure the folders chan180, chan395, and chan590 (each containing a profiles/ subdirectory) are placed in the root directory.
-· Google Colab: If running in Colab without the data, the script will automatically prompt you to upload a compressed archive (chandata.tar.gz or chandata.zip) containing the folders.
+[
+\widehat{g}=f(U,k).
+]
 
-2. Run the Code
+If two admissible velocity states share the same values of (U) and (k), but produce different values of (g), no such closure can reproduce both states exactly.
 
-Execute the main script from your terminal:
+For two admissible states with target values (g_1) and (g_2), the minimax error satisfies
 
-```bash
-python supplementary.py
-```
+[
+\max\left(
+|f(U,k)-g_1|,
+|f(U,k)-g_2|
+\right)
+\geq \frac{|g_1-g_2|}{2}.
+]
 
-3. Outputs
+This lower bound is independent of the particular algebraic form of the closure.
 
-Upon successful execution, the script generates the following files:
+---
 
-· figures/fig1_phi_variance.pdf: Comparison of closed-form formulas against the Monte Carlo surrogate across the boundary layer.
-· figures/fig2_assumptions.pdf: Quantitative failure of the mean shift, skewness, and Gaussianity assumptions.
-· figures/fig3_barrier.pdf: The Information Barrier at fixed (U=8.0, k=4.0), illustrating the massive structural spread (\Delta = 0.1480).
-· results/dns_comparison.csv: Full table of DNS comparisons and error diagnostics.
-· results/barrier.csv: Raw data for the information barrier spread.
-· results/summary.json: Summary of the Monte Carlo parameters and barrier bounds.
+2. Computational Framework
 
-📝 Citation
+The numerical investigation contains two conceptually distinct components.
 
-If you use this code or find these results useful in your research, please cite the corresponding paper:
+2.1 Controlled Gaussian anisotropy experiment
 
-```bibtex
-@article{AbdelSattar2026,
-  title={The Information Barrier of Algebraic Wall Functions: Why \(U\) and \(k\) Cannot Determine the Arcsinh-Transformed Velocity Variance},
-  author={Abdel-Sattar, Mahmoud F.},
-  journal={Journal of Fluid Mechanics (Rapids)},
-  year={2026},
-  note={Under Review}
-}
-```
+A controlled family of Gaussian velocity fluctuations is constructed while keeping (U) and (k) fixed.
 
-📧 Contact
+The anisotropy ratio is defined as
 
-For any questions, issues, or collaborations, please contact:
-Mahmoud F. Abdel-Sattar
-Department of Astronomy and Meteorology, Faculty of Science, Al-Azhar University, Cairo, Egypt.
-Email: m.f.abdel-sattar@azhar.edu.eg
+[
+A=
+\frac{\langle v'^2\rangle+\langle w'^2\rangle}
+{\langle u'^2\rangle}.
+]
 
-⚖️ License
+Under the controlled assumptions of zero cross-correlations and equal transverse variances,
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+[
+\Sigma(A)=
+\begin{pmatrix}
+\dfrac{2k}{1+A} & 0 & 0\[6pt]
+0 & \dfrac{Ak}{1+A} & 0\[6pt]
+0 & 0 & \dfrac{Ak}{1+A}
+\end{pmatrix}.
+]
+
+Consequently,
+
+[
+\langle u'^2\rangle=\frac{2k}{1+A},
+]
+
+and
+
+[
+\langle v'^2\rangle
+
+\langle w'^2\rangle
+
+\frac{Ak}{1+A}.
+]
+
+The principal controlled experiment uses
+
+[
+U=8,\qquad k=4,
+]
+
+and examines the anisotropy range
+
+[
+A\in[0,2].
+]
+
+An extended sweep explores
+
+[
+A\in[0,10].
+]
+
+This construction isolates the effect of changing the distribution of turbulent kinetic energy among velocity components while preserving the same mean velocity and total turbulent kinetic energy.
+
+Important: This is a controlled Gaussian subfamily, not a representation of the entire realizable Reynolds-stress state space.
+
+2.2 DNS-parameterized Gaussian surrogate
+
+A separate computational component uses turbulence statistics obtained from DNS channel-flow data.
+
+The analysis considers the friction Reynolds numbers
+
+[
+Re_\tau=180,\quad 395,\quad 590.
+]
+
+The available mean-velocity and Reynolds-stress statistics are used to construct covariance matrices for Gaussian surrogate ensembles.
+
+The resulting Monte Carlo samples are used to evaluate the transformed velocity statistics.
+
+This procedure is a DNS-parameterized Gaussian surrogate analysis, not direct sampling of instantaneous DNS velocity fields. It preserves the prescribed second-order covariance information but does not reproduce the full non-Gaussian probability distribution of the original turbulent velocity fluctuations.
+
+---
+
+3. Exact Statistical Identity
+
+The computational framework is connected to the exact identity
+
+[
+\left\langle\cosh(2\phi)\right\rangle
+
+1+2U^2+4k
+]
+
+when velocities are expressed in wall units and the velocity fluctuations have zero mean.
+
+In dimensional variables,
+
+[
+\left\langle\cosh(2\phi)\right\rangle
+
+1+\frac{2U^2+4k}{u_\tau^2}.
+]
+
+This identity does not require Gaussian statistics or isotropy.
+
+It provides an exact constraint on the transformed velocity distribution, while the variance of (\phi) remains sensitive to additional statistical information.
+
+---
+
+4. Numerical Experiments and Diagnostics
+
+The computational study includes the following analyses:
+
+- Evaluation of the arcsinh-transformed velocity variance.
+- Controlled variation of the anisotropy ratio at fixed (U) and (k).
+- Estimation of the spread in the target statistic across admissible states.
+- Evaluation of the corresponding minimax lower bound.
+- Extended anisotropy sweeps.
+- Independent random-seed comparisons.
+- Nested Monte Carlo sample-size convergence.
+- Paired adjacent-increment diagnostics for the numerical anisotropy sweep.
+- DNS-parameterized Gaussian surrogate comparisons.
+
+Monte Carlo settings
+
+The principal extended anisotropy sweep uses:
+
+- 1001 anisotropy points.
+- (A\in[0,10]).
+- (\Delta A=0.01).
+- (N=200{,}000) samples per state.
+- Five independent random seeds.
+
+The paired local-monotonicity diagnostics examine seeds 29 and 71 and account for multiple comparisons across 1000 adjacent intervals using Bonferroni correction.
+
+The convergence analysis examines increasing sample sizes up to
+
+[
+N=1.6\times10^6.
+]
+
+---
+
+5. Reported Numerical Findings
+
+For the controlled experiment, the reported mean spreads and minimax bounds are:
+
+Anisotropy range| Mean spread| Minimax bound
+(A\in[0,2])| 0.1454| 0.0727
+(A\in[0,10])| 0.1735| 0.0868
+
+Extending the anisotropy range from ([0,2]) to ([0,10]) increases the mean spread by approximately 19.4%.
+
+The paired adjacent-increment diagnostics detect no statistically significant upward increments in the tested numerical sweeps, including after Bonferroni correction.
+
+These numerical observations do not constitute an analytical proof of continuous monotonicity of
+
+[
+g(A)=\operatorname{Var}(\phi)
+]
+
+at finite (U).
+
+The distinction between numerical evidence and analytical proof is maintained throughout the study.
+
+---
+
+6. Reproducibility
+
+The computational results depend on the following elements:
+
+1. The supplied DNS channel-flow data.
+2. The prescribed covariance construction.
+3. The controlled Gaussian covariance family.
+4. The Monte Carlo sample sizes.
+5. The random seeds.
+6. The anisotropy sampling grid.
+7. The statistical post-processing and diagnostic procedures.
+
+The DNS data preparation workflow requires the archive
+
+"chandata.tar.gz"
+
+where requested by the corresponding data-preparation script.
+
+The archive should be placed in the location expected by that script before running the DNS-data preparation stage.
+
+For reproducibility, retain the original random seeds, sample sizes, and anisotropy grid used in the reported experiments.
+
+Execution instructions: The exact script entry points, command-line arguments, and dependency versions should be specified here after matching this documentation against the final repository contents.
+
+---
+
+7. Interpretation and Scope
+
+The results should be interpreted within the assumptions of the corresponding numerical experiment.
+
+In particular:
+
+- The controlled Gaussian experiment demonstrates an information barrier within a specified admissible subfamily.
+- The DNS-parameterized Gaussian surrogate uses DNS-derived statistical inputs but does not reproduce the complete instantaneous DNS probability distribution.
+- The minimax theorem is independent of the Gaussian surrogate used in the numerical evaluation.
+- The Reynolds-stress tensor supplies additional second-order information, but does not necessarily determine the complete probability distribution required to evaluate nonlinear transformed statistics.
+- The observed finite-(U) behavior of the arcsinh-transformed variance should not be confused with a general analytical monotonicity theorem.
+
+The analytical result concerning the variance of the squared velocity magnitude is also distinct from a proof of monotonicity of the arcsinh-transformed variance.
+
+---
+
+8. Repository Structure
+
+The repository is organized around the computational scripts, input data preparation, numerical diagnostics, and generated results.
+
+The final directory structure and script descriptions should be added here to reflect the actual files in the repository.
+
+Suggested documentation categories:
+
+- Main computational scripts.
+- DNS data preparation.
+- Controlled Gaussian experiments.
+- Monte Carlo convergence analysis.
+- Paired monotonicity diagnostics.
+- Output tables and figures.
+
+---
+
+9. Scientific Reference
+
+The computational material accompanies the manuscript:
+
+The Information Barrier of Algebraic Wall Functions: Why U and k Cannot Determine the Arcsinh-Transformed Velocity Variance.
+
+The repository is intended to support examination, reproduction, and independent verification of the numerical experiments reported in that work.
+
+---
+
+10. Contact
+
+For questions concerning the computational methodology, numerical implementation, or scientific interpretation, please use the GitHub repository's issue-tracking facility or contact the corresponding author.
